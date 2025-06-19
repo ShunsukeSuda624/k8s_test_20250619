@@ -17,7 +17,7 @@ jobs:
       - name: Configure AWS credentials from OIDC
         uses: aws-actions/configure-aws-credentials@v3
         with:
-          role-to-assume: arn:aws:iam::334678299258:role/mh_githubconnection_test # AWS IAMロールのARN
+          role-to-assume: arn:aws:iam::334678299258:role/suda_test # AWS IAMロールのARN
           aws-region: ap-northeast-1 # AWSリージョン
 
       # ECRログイン
@@ -28,7 +28,7 @@ jobs:
       - name: Build and push Docker image
         env:
           ECR_REGISTRY: 334678299258.dkr.ecr.ap-northeast-1.amazonaws.com # ECRレジストリURI
-          ECR_REPOSITORY: mh-github-repo-tempctn-20250528 # ECRリポジトリ名
+          ECR_REPOSITORY: suda20250619 # ECRリポジトリ名
         run: |
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:latest . # Dockerイメージをビルド
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest # DockerイメージをECRへpush
