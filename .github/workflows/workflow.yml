@@ -1,0 +1,34 @@
+name: Push Docker Image to ECR on Commit # ワークフローの名前
+
+on:
+  push: # pushイベントでワークフローをトリガー
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3 # リポジトリをチェックアウト
+
+      # AWS認証（OIDC経由）
+      - name: Configure AWS credentials from OIDC
+        uses: aws-actions/configure-aws-credentials@v3
+        with:
+          role-to-assume: arn:aws:iam::334678299258:role/mh_githubconnection_test # AWS IAMロールのARN
+          aws-region: ap-northeast-1 # AWSリージョン
+
+      # ECRログイン
+      - name: Login to Amazon ECR
+        uses: aws-actions/amazon-ecr-login@v2
+
+      # ビルド＆push
+      - name: Build and push Docker image
+        env:
+          ECR_REGISTRY: 334678299258.dkr.ecr.ap-northeast-1.amazonaws.com # ECRレジストリURI
+          ECR_REPOSITORY: mh-github-repo-tempctn-20250528 # ECRリポジトリ名
+        run: |
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:latest . # Dockerイメージをビルド
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest # DockerイメージをECRへpush
